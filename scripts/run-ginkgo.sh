@@ -2,7 +2,7 @@
 
 
 # to run: 
-# KUBE_CONFIG_PATH=/Users/courouba/.kube/config ./run-ginkgo.sh
+# KUBE_CONFIG_PATH=<kubeconfig path> ./run-ginkgo.sh
 
 set -e
 
@@ -19,3 +19,12 @@ cd ../test/integration
 
 echo "Starting the ginkgo test suite" 
 GO111MODULE=on go test -v -timeout 0 ./... --kubeconfig=$KUBE_CONFIG_PATH --ginkgo.focus="\[cni-integration\]" --ginkgo.skip="\[Disruptive\]" --assets=./assets
+
+TEST_PASS=$?
+if [[ $TEST_PASS -eq 1 ]];
+then
+    echo "Ginkgo test failed"
+    exit 1
+fi
+
+echo "Ginkgo test suite completed successfully"
