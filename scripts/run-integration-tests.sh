@@ -175,6 +175,8 @@ if [[ "$PROVISION" == true ]]; then
     elif [[ "$RUN_KOPS_TEST" == true ]]; then
         up-kops-cluster
     else
+        ensure_eksctl
+        # TODO: config files and change from k8s tester to eksctl
         up-test-cluster
     fi
     UP_CLUSTER_DURATION=$((SECONDS - START))
@@ -195,12 +197,17 @@ sed -i'.bak' "s,:$MANIFEST_IMAGE_VERSION,:$TEST_IMAGE_VERSION," "$TEST_CONFIG_PA
 sed -i'.bak' "s,602401143452.dkr.ecr.us-west-2.amazonaws.com/amazon-k8s-cni-init,$INIT_IMAGE_NAME," "$TEST_CONFIG_PATH"
 sed -i'.bak' "s,:$MANIFEST_IMAGE_VERSION,:$TEST_IMAGE_VERSION," "$TEST_CONFIG_PATH"
 
-if [[ $RUN_KOPS_TEST == true || $RUN_BOTTLEROCKET_TEST == true ]]; then
-    KUBECTL_PATH=kubectl
-    export KUBECONFIG=~/.kube/config
-else
-    export KUBECONFIG=$KUBECONFIG_PATH
-fi
+#
+#if [[ $RUN_KOPS_TEST == true || $RUN_BOTTLEROCKET_TEST == true ]]; then
+#    KUBECTL_PATH=kubectl
+#    export KUBECONFIG=~/.kube/config
+#else
+#    # TODO: remove this. Default kubeconfig only
+#    export KUBECONFIG=$KUBECONFIG_PATH
+#fi
+
+KUBECTL_PATH=kubectl
+export KUBECONFIG=~/.kube/config
 
 if [[ $RUN_KOPS_TEST == true ]]; then
     run_kops_conformance
